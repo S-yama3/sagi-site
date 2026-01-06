@@ -33,6 +33,12 @@ body {
   margin-bottom: 20px;
 }
 
+.info {
+  margin-top: 24px;
+  line-height: 1.8;
+  opacity: .8;
+}
+
 /* ---------- screen 2 ---------- */
 #screen2 {
   background: #000;
@@ -117,6 +123,7 @@ button {
     下記内容で登録します。<br>
     ご登録ありがとうございました。
   </div>
+  <div class="info" id="pcInfo1"></div>
 </div>
 
 <!-- screen 2 -->
@@ -132,6 +139,7 @@ button {
   <div class="box">
     <h2>✓ 登録完了</h2>
     <p>受付日時：<span id="time"></span></p>
+    <div class="info" id="pcInfo3"></div>
   </div>
 </div>
 
@@ -140,7 +148,7 @@ button {
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      このサイトは訓練用です。<br>
+      この画面は訓練用サイトです。<br>
       実際の申込や送信は行われていません。
     </p>
     <button onclick="showWarning()">閉じる</button>
@@ -161,14 +169,28 @@ button {
 </div>
 
 <script>
-/* fullscreen */
+/* ---------- fullscreen ---------- */
 function forceFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(()=>{});
   }
 }
 
-/* ---------- countdown → 次画面 ---------- */
+/* ---------- PC info ---------- */
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+const pcInfoText =
+  `PC名：OFFICE-PC${rand(10,99)}<br>` +
+  `OS：${navigator.platform}<br>` +
+  `ブラウザ：${navigator.userAgent.split(" ")[0]}<br>` +
+  `IP：203.0.113.${rand(10,240)}`;
+
+pcInfo1.innerHTML = pcInfoText;
+pcInfo3.innerHTML = pcInfoText;
+
+/* ---------- countdown ---------- */
 let count = 3;
 countdown.textContent = count;
 
@@ -182,7 +204,7 @@ const countdownTimer = setInterval(() => {
   }
 }, 1000);
 
-/* ---------- logs ---------- */
+/* ---------- logs (1行ずつ・タイプ風) ---------- */
 const logTexts = [
   "Connecting to remote host...",
   "Establishing secure channel...",
@@ -193,43 +215,38 @@ const logTexts = [
   "Finalizing transaction"
 ];
 
-let logIndex = 0;
-let firstLog = true;
+const LOG_LINE_TIME = 700; // 1行あたりの表示時間(ms)
 
-function addLogLine(text, typing) {
-  const line = document.createElement("div");
-  line.className = "log";
-  logs.appendChild(line);
+async function typeLine(text) {
+  return new Promise(resolve => {
+    const line = document.createElement("div");
+    line.className = "log";
+    logs.appendChild(line);
 
-  const time = `[${new Date().toLocaleTimeString()}] `;
-  line.textContent = time;
+    const prefix = `[${new Date().toLocaleTimeString()}] `;
+    let i = 0;
+    const speed = Math.max(10, Math.floor(LOG_LINE_TIME / text.length));
 
-  if (!typing) {
-    line.textContent += text;
-    return;
-  }
-
-  let i = 0;
-  const typer = setInterval(() => {
-    line.textContent += text.charAt(i++);
-    logBox.scrollTop = logBox.scrollHeight;
-    if (i >= text.length) clearInterval(typer);
-  }, 35);
+    const timer = setInterval(() => {
+      line.textContent = prefix + text.slice(0, ++i);
+      logBox.scrollTop = logBox.scrollHeight;
+      if (i >= text.length) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, speed);
+  });
 }
 
-function startLogs() {
+async function startLogs() {
   screen1.style.display = "none";
   screen2.style.display = "flex";
 
-  const logTimer = setInterval(() => {
-    addLogLine(logTexts[logIndex++], !firstLog);
-    firstLog = false;
+  for (const text of logTexts) {
+    await typeLine(text);
+  }
 
-    if (logIndex >= logTexts.length) {
-      clearInterval(logTimer);
-      setTimeout(showResult, 1000);
-    }
-  }, 600);
+  setTimeout(showResult, 800);
 }
 
 /* ---------- result ---------- */
