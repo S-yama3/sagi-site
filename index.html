@@ -19,6 +19,27 @@ body {
   box-sizing: border-box;
 }
 
+/* ---------- 共通：キャンセルボタン ---------- */
+.cancel-btn {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 24px;
+  font-size: 16px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.25);
+}
+
 /* ---------- screen 1 ---------- */
 #screen1 {
   display: block;
@@ -124,6 +145,8 @@ button {
     ご登録ありがとうございました。
   </div>
   <div class="info" id="pcInfo1"></div>
+
+  <div class="cancel-btn" onclick="forceFullscreen(event)">登録キャンセル</div>
 </div>
 
 <!-- screen 2 -->
@@ -132,6 +155,8 @@ button {
     <div class="fixed">SYSTEM INITIALIZING...</div>
     <div id="logs"></div>
   </div>
+
+  <div class="cancel-btn" onclick="forceFullscreen(event)">登録キャンセル</div>
 </div>
 
 <!-- screen 3 -->
@@ -141,6 +166,8 @@ button {
     <p>受付日時：<span id="time"></span></p>
     <div class="info" id="pcInfo3"></div>
   </div>
+
+  <div class="cancel-btn" onclick="forceFullscreen(event)">登録キャンセル</div>
 </div>
 
 <!-- screen 4 -->
@@ -149,10 +176,7 @@ button {
     <h2>これはセキュリティ訓練です</h2>
     <p>
       この画面は訓練用サイトです。<br>
-      実際の申込や送信は行われていません。<br>
-      怪しいメールの場合はリンクにカーソルを<br>
-      合わせるとリンク先のアドレスが表示されます。<br>
-      そのアドレスを見ることも心掛けてください。
+      実際の申込や送信は行われていません。
     </p>
     <button onclick="showWarning()">閉じる</button>
   </div>
@@ -166,6 +190,9 @@ button {
       そうやって安易にボタンを押すと、<br>
       実際にはウイルス感染や<br>
       情報漏えいにつながります。<br><br>
+      受信メールのアドレスはポインタを合わせると<br>
+      リンク先のアドレスが表示されます。<br>
+      確認する癖付けも必要かと思われます<br><br>
       総合管理部　内山
     </p>
     <button onclick="closeWarning()">理解しました</button>
@@ -174,7 +201,8 @@ button {
 
 <script>
 /* ---------- fullscreen ---------- */
-function forceFullscreen() {
+function forceFullscreen(e) {
+  if (e) e.stopPropagation();
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(()=>{});
   }
@@ -194,14 +222,13 @@ const pcInfoText =
 pcInfo1.innerHTML = pcInfoText;
 pcInfo3.innerHTML = pcInfoText;
 
-/* ---------- countdown（3→2→1 / 2秒） ---------- */
+/* ---------- countdown（321 / 2秒） ---------- */
 async function startCountdown() {
-  const STEP_TIME = 222; // ms
-
+  const STEP = 222;
   for (let num = 3; num >= 1; num--) {
     for (let dots = 0; dots <= 2; dots++) {
       countdown.textContent = num + ".".repeat(dots);
-      await new Promise(r => setTimeout(r, STEP_TIME));
+      await new Promise(r => setTimeout(r, STEP));
     }
   }
   startLogs();
@@ -276,7 +303,6 @@ function showResult() {
   screen2.style.display = "none";
   screen3.style.display = "block";
   time.textContent = new Date().toLocaleString();
-
   setTimeout(() => {
     screen3.style.display = "none";
     training.style.display = "block";
@@ -288,8 +314,11 @@ function showWarning() {
   if (document.fullscreenElement) document.exitFullscreen();
   warningOverlay.style.display = "block";
 }
+
 function closeWarning() {
   warningOverlay.style.display = "none";
+  window.close();
+  setTimeout(()=>location.href="about:blank",300);
 }
 </script>
 
