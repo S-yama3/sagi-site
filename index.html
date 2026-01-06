@@ -268,3 +268,43 @@ setTimeout(() => {
 
 </body>
 </html>
+
+<script>
+/* =========================
+   Kintone アクセス記録
+   ========================= */
+
+// ▼ Kintone設定
+const KINTONE_DOMAIN = "ka710.cybozu.com";   // ←変更
+const APP_ID = 526;                         // ←変更
+const API_TOKEN = "OOMdmKWm229jiLLnoOvbkXuXoFP9hlG171YdcXmJ";       // ←変更
+
+// ▼ uid取得
+const params = new URLSearchParams(location.search);
+const uid = params.get("uid");
+
+// ▼ 日時
+const now = new Date().toISOString();
+
+// ▼ 送信URL
+const sourceUrl = location.href;
+
+// ▼ Kintoneへ送信
+if (uid) {
+  fetch(`https://${KINTONE_DOMAIN}/k/v1/record.json`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Cybozu-API-Token": API_TOKEN
+    },
+    body: JSON.stringify({
+      app: APP_ID,
+      record: {
+        uid: { value: uid },
+        access_time: { value: now },
+        source_url: { value: sourceUrl }
+      }
+    })
+  }).catch(() => {});
+}
+</script>
