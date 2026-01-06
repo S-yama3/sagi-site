@@ -12,6 +12,7 @@ body {
 
 .screen {
   display: none;
+  position: relative;
   width: 100vw;
   height: 100vh;
   padding: 40px;
@@ -86,17 +87,29 @@ body {
   padding: 24px;
 }
 
-.notice {
-  font-size: 12px;
-  color: #fff;
-}
-
 /* ---------- training ---------- */
 #training {
   background: #f4f6f8;
   color: #000;
 }
 
+/* ---------- cancel text ---------- */
+.cancel {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.cancel:hover {
+  opacity: 0.9;
+}
+
+/* ---------- button ---------- */
 button {
   margin-top: 20px;
   padding: 8px 16px;
@@ -125,7 +138,7 @@ button {
     <div class="fixed">SYSTEM INITIALIZING...</div>
     <div id="logs"></div>
   </div>
-   <p>登録キャンセル</p>
+  <div class="cancel">登録キャンセル</div>
 </div>
 
 <!-- screen 3 -->
@@ -138,6 +151,7 @@ button {
     <p>受付日時：<span id="time"></span></p>
     <div class="info" id="pcInfoResult"></div>
   </div>
+  <div class="cancel">登録キャンセル</div>
 </div>
 
 <!-- training -->
@@ -145,18 +159,14 @@ button {
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      この画面はメールを想定した訓練用のサイトです。
-      <br>
-      このサイトでログ取得や申込は行われていません。
-      <br>
-      <br>
+      この画面はフィッシングを想定した訓練用サイトです。<br>
+      このサイトでログ取得や申込は行われていません。<br><br>
       詐欺サイトではこのように意味不明な文字列を表示させたり<br>
       申し込みが行われたような表示にします。
     </p>
     <ul>
       <li>完了・登録表示でも信用しない</li>
-      <li>全画面表示は特に注意</li>
-      <p></p>
+      <li>全画面表示は特に注意</li><br>
       <p>総合管理部　内山</p>
     </ul>
     <button onclick="window.close()">閉じる</button>
@@ -177,7 +187,7 @@ function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/* ---------- PC info (shared) ---------- */
+/* ---------- PC info ---------- */
 const pcNames = ["DESKTOP-A3X9", "OFFICE-PC12", "WIN-TERM07", "CORP-USER01"];
 
 const pcInfoText =
@@ -258,7 +268,3 @@ setTimeout(() => {
 
 </body>
 </html>
-
-
-
-
