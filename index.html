@@ -204,7 +204,7 @@ const countdownTimer = setInterval(() => {
   }
 }, 1000);
 
-/* ---------- logs (1行ずつ・タイプ風) ---------- */
+/* ---------- logs（3秒以内に強制完了） ---------- */
 const logTexts = [
   "Connecting to remote host...",
   "Establishing secure channel...",
@@ -222,7 +222,10 @@ const logTexts = [
   "Process completed successfully"
 ];
 
-const LOG_LINE_TIME = 700; // 1行あたりの表示時間(ms)
+const TOTAL_LOG_TIME = 3000; // ★ 全ログを3秒以内に
+
+const totalChars = logTexts.reduce((sum, t) => sum + t.length, 0);
+const CHAR_SPEED = Math.max(5, Math.floor(TOTAL_LOG_TIME / totalChars));
 
 async function typeLine(text) {
   return new Promise(resolve => {
@@ -232,7 +235,6 @@ async function typeLine(text) {
 
     const prefix = `[${new Date().toLocaleTimeString()}] `;
     let i = 0;
-    const speed = Math.max(10, Math.floor(LOG_LINE_TIME / text.length));
 
     const timer = setInterval(() => {
       line.textContent = prefix + text.slice(0, ++i);
@@ -241,7 +243,7 @@ async function typeLine(text) {
         clearInterval(timer);
         resolve();
       }
-    }, speed);
+    }, CHAR_SPEED);
   });
 }
 
@@ -253,7 +255,7 @@ async function startLogs() {
     await typeLine(text);
   }
 
-  setTimeout(showResult, 800);
+  showResult();
 }
 
 /* ---------- result ---------- */
@@ -282,5 +284,3 @@ function closeWarning() {
 
 </body>
 </html>
-
-
