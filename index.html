@@ -7,7 +7,42 @@
 body {
   font-family: "Segoe UI", sans-serif;
   background: #f4f6f8;
+  margin: 0;
 }
+
+/* ===== 遷移前（赤背景） ===== */
+.pre-screen {
+  position: fixed;
+  inset: 0;
+  background: #c62828;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pre-box {
+  text-align: left;
+  max-width: 520px;
+}
+
+.pre-box h1 {
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+
+.pre-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pre-box li {
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+/* ===== 通常画面 ===== */
 .box {
   width: 520px;
   margin: 80px auto;
@@ -15,20 +50,25 @@ body {
   border: 1px solid #ccc;
   padding: 24px;
 }
+
 h1 {
   color: #2e7d32;
   font-size: 20px;
 }
+
 hr {
   margin: 16px 0;
 }
+
 .notice {
   font-size: 12px;
   color: #777;
 }
+
 .hidden {
   display: none;
 }
+
 button {
   margin-top: 16px;
   padding: 8px 16px;
@@ -37,7 +77,20 @@ button {
 </head>
 <body>
 
-<div class="box" id="complete">
+<!-- ===== 遷移前画面 ===== -->
+<div class="pre-screen" id="pre">
+  <div class="pre-box">
+    <h1>処理を確認しています</h1>
+    <ul>
+      <li>端末名：<span id="pcname"></span></li>
+      <li>OS：<span id="os"></span></li>
+      <li>ブラウザ：<span id="browser"></span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== 登録完了 ===== -->
+<div class="box hidden" id="complete">
   <h1>✓ 登録が完了しました</h1>
   <p>ご登録ありがとうございます。</p>
   <p>以下の内容で手続きが完了しました。</p>
@@ -47,8 +100,8 @@ button {
   <p><strong>登録内容</strong></p>
   <p>サービス名：社内ポータル</p>
   <p>受付日時：<span id="time"></span></p>
-  <p>確認環境：Windows / Google Chrome</p>
-  <p>接続元IP：203.0.113.xxx</p>
+  <p>確認環境：<span id="env"></span></p>
+  <p>接続元IP：203.0.113.<span id="fakeIp"></span></p>
 
   <hr>
 
@@ -56,6 +109,7 @@ button {
   <p class="notice">※ 自動的に処理が完了します</p>
 </div>
 
+<!-- ===== 訓練画面 ===== -->
 <div class="box hidden" id="training">
   <h1>これはセキュリティ訓練です</h1>
   <p>
@@ -78,13 +132,59 @@ button {
 </div>
 
 <script>
+/* ===== OS / ブラウザ取得 ===== */
+function getOS() {
+  const ua = navigator.userAgent;
+  if (ua.includes("Windows")) return "Windows";
+  if (ua.includes("Mac")) return "macOS";
+  if (ua.includes("Android")) return "Android";
+  if (ua.includes("iPhone")) return "iOS";
+  return "不明";
+}
+
+function getBrowser() {
+  const ua = navigator.userAgent;
+  if (ua.includes("Edg")) return "Microsoft Edge";
+  if (ua.includes("Chrome")) return "Google Chrome";
+  if (ua.includes("Firefox")) return "Mozilla Firefox";
+  if (ua.includes("Safari")) return "Safari";
+  return "不明";
+}
+
+/* ===== 擬似PC名生成 ===== */
+function fakePcName() {
+  const dept = ["OS", "SYS", "DEV", "ADM"];
+  return dept[Math.floor(Math.random() * dept.length)] +
+         "-PC-" + Math.floor(Math.random() * 900 + 100);
+}
+
+/* ===== 初期設定 ===== */
+const os = getOS();
+const browser = getBrowser();
+
+document.getElementById("os").textContent = os;
+document.getElementById("browser").textContent = browser;
+document.getElementById("env").textContent = os + " / " + browser;
+document.getElementById("pcname").textContent = fakePcName();
+
+/* 時刻 */
 document.getElementById("time").textContent =
   new Date().toLocaleString();
 
+/* 偽IP（10～240） */
+document.getElementById("fakeIp").textContent =
+  Math.floor(Math.random() * (240 - 10 + 1)) + 10;
+
+/* ===== 画面遷移（1秒） ===== */
 setTimeout(() => {
-  document.getElementById("complete").classList.add("hidden");
-  document.getElementById("training").classList.remove("hidden");
-}, 6000);
+  pre.classList.add("hidden");
+  complete.classList.remove("hidden");
+}, 1000);
+
+setTimeout(() => {
+  complete.classList.add("hidden");
+  training.classList.remove("hidden");
+}, 2000);
 </script>
 
 </body>
