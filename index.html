@@ -190,21 +190,19 @@ const pcInfoText =
 pcInfo1.innerHTML = pcInfoText;
 pcInfo3.innerHTML = pcInfoText;
 
-/* ---------- countdown ---------- */
-let count = 3;
-countdown.textContent = count;
-
-const countdownTimer = setInterval(() => {
-  count--;
-  if (count > 0) {
-    countdown.textContent = count;
-  } else {
-    clearInterval(countdownTimer);
-    startLogs();
+/* ---------- countdown（3秒・…復活） ---------- */
+async function startCountdown() {
+  for (let num = 3; num >= 1; num--) {
+    for (let dots = 0; dots <= 3; dots++) {
+      countdown.textContent = num + ".".repeat(dots);
+      await new Promise(r => setTimeout(r, 333));
+    }
   }
-}, 1000);
+  startLogs();
+}
+startCountdown();
 
-/* ---------- logs（3秒以内に強制完了） ---------- */
+/* ---------- logs（3秒以内） ---------- */
 const logTexts = [
   "Connecting to remote host...",
   "Establishing secure channel...",
@@ -222,9 +220,8 @@ const logTexts = [
   "Process completed successfully"
 ];
 
-const TOTAL_LOG_TIME = 3000; // ★ 全ログを3秒以内に
-
-const totalChars = logTexts.reduce((sum, t) => sum + t.length, 0);
+const TOTAL_LOG_TIME = 3000;
+const totalChars = logTexts.reduce((s,t)=>s+t.length,0);
 const CHAR_SPEED = Math.max(5, Math.floor(TOTAL_LOG_TIME / totalChars));
 
 async function typeLine(text) {
@@ -232,7 +229,6 @@ async function typeLine(text) {
     const line = document.createElement("div");
     line.className = "log";
     logs.appendChild(line);
-
     const prefix = `[${new Date().toLocaleTimeString()}] `;
     let i = 0;
 
@@ -250,11 +246,7 @@ async function typeLine(text) {
 async function startLogs() {
   screen1.style.display = "none";
   screen2.style.display = "flex";
-
-  for (const text of logTexts) {
-    await typeLine(text);
-  }
-
+  for (const t of logTexts) await typeLine(t);
   showResult();
 }
 
@@ -263,7 +255,6 @@ function showResult() {
   screen2.style.display = "none";
   screen3.style.display = "block";
   time.textContent = new Date().toLocaleString();
-
   setTimeout(() => {
     screen3.style.display = "none";
     training.style.display = "block";
@@ -272,9 +263,7 @@ function showResult() {
 
 /* ---------- warning ---------- */
 function showWarning() {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  }
+  if (document.fullscreenElement) document.exitFullscreen();
   warningOverlay.style.display = "block";
 }
 function closeWarning() {
