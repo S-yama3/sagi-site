@@ -2,224 +2,194 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>登録完了</title>
+<title>Security Training</title>
+
 <style>
-body {
-  font-family: "Segoe UI", sans-serif;
+html, body {
   margin: 0;
-}
-
-/* ===== 1画面目（黒背景） ===== */
-.pre-screen {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pre-box {
-  max-width: 520px;
-  text-align: left;
-}
-
-.pre-box h1 {
-  color: #fff;
-  font-size: 26px;
-  margin-bottom: 16px;
-}
-
-.pre-box ul {
-  list-style: none;
   padding: 0;
-  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Consolas, monospace;
 }
 
-.pre-box li {
-  margin-bottom: 6px;
-  font-size: 15px;
+/* 共通 */
+.screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
-/* カウントダウン */
-.countdown {
-  margin-top: 20px;
-  font-size: 48px;
-  font-weight: bold;
-  text-align: center;
+/* ① 黒（初期） */
+#screen1 {
+  background: black;
+  color: white;
 }
 
-/* ===== 共通BOX ===== */
+/* ② 黒（ログ） */
+#screen2 {
+  background: black;
+  color: #00ff66;
+  align-items: flex-start;
+  padding: 30px;
+  font-size: 18px;
+}
+
+/* ③ 赤（完了） */
+#screen3 {
+  background: red;
+  color: white;
+  font-size: 26px;
+  animation: fade 5s linear infinite;
+}
+
+/* ④ 訓練説明 */
+#screen4 {
+  background: #f4f6f8;
+  color: #333;
+  font-family: "Segoe UI", sans-serif;
+}
+
 .box {
   width: 520px;
-  margin: 80px auto;
   background: #fff;
   border: 1px solid #ccc;
   padding: 24px;
 }
 
-h1 {
-  color: #2e7d32;
-  font-size: 20px;
+@keyframes fade {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
 }
 
-hr {
-  margin: 16px 0;
+.countdown {
+  font-size: 64px;
 }
 
-.notice {
-  font-size: 12px;
-  color: #777;
+.small {
+  font-size: 14px;
+  margin-top: 10px;
 }
 
-.hidden {
-  display: none;
-}
-
-button {
-  margin-top: 16px;
-  padding: 8px 16px;
-}
-
-/* ===== 2画面目（赤背景） ===== */
-.danger {
-  background: #c62828;
-  color: #fff;
-  border-color: #a61b1b;
-}
-
-.danger h1 {
-  color: #fff;
+#log {
+  white-space: pre-line;
 }
 </style>
 </head>
+
 <body>
 
-<!-- ===== 1画面目 ===== -->
-<div class="pre-screen" id="pre">
-  <div class="pre-box">
-    <h1>処理を確認しています</h1>
+<!-- ① 初期画面 -->
+<div id="screen1" class="screen">
+  <div>Initializing System...</div>
+  <div class="countdown" id="countdown">3</div>
+  <div class="small" id="info"></div>
+</div>
+
+<!-- ② ログ流し -->
+<div id="screen2" class="screen">
+  <div id="log"></div>
+</div>
+
+<!-- ③ 完了 -->
+<div id="screen3" class="screen">
+  <div>自動的に処理が完了します</div>
+</div>
+
+<!-- ④ 訓練説明 -->
+<div id="screen4" class="screen">
+  <div class="box">
+    <h2>これはセキュリティ訓練です</h2>
+    <p>
+      今回表示された一連の画面は、
+      標的型攻撃メールを想定した社内訓練です。
+    </p>
     <ul>
-      <li>端末名：<span id="pcname"></span></li>
-      <li>OS：<span id="os"></span></li>
-      <li>ブラウザ：<span id="browser"></span></li>
+      <li>完了・確認画面でも安易に信用しない</li>
+      <li>処理中ログは攻撃でよく使われる演出</li>
+      <li>不審な場合は必ず管理者へ報告</li>
     </ul>
-    <div class="countdown">
-      <span id="count">3</span>
-    </div>
+    <p style="font-size:12px;color:#777;margin-top:16px;">
+      ※ 実際の通信・情報送信は行われていません
+    </p>
   </div>
 </div>
 
-<!-- ===== 2画面目 ===== -->
-<div class="box danger hidden" id="complete">
-  <h1>✓ 登録が完了しました</h1>
-  <p>ご登録ありがとうございます。</p>
-  <p>以下の内容で手続きが完了しました。</p>
-
-  <hr>
-
-  <p><strong>登録内容</strong></p>
-  <p>サービス名：社内ポータル</p>
-  <p>受付日時：<span id="time"></span></p>
-  <p>確認環境：<span id="env"></span></p>
-  <p>接続元IP：203.0.113.<span id="fakeIp"></span></p>
-
-  <hr>
-
-  <p>このまま画面を閉じてください。</p>
-  <p class="notice">※ 自動的に処理が完了します</p>
-</div>
-
-<!-- ===== 3画面目 ===== -->
-<div class="box hidden" id="training">
-  <h1>これはセキュリティ訓練です</h1>
-  <p>
-    今回の操作は、標的型攻撃メールを想定した
-    セキュリティ訓練です。
-  </p>
-  <p>
-    「登録完了」「確認ありがとうございます」といった
-    表現は、実際の攻撃でもよく使用されます。
-  </p>
-
-  <hr>
-
-  <ul>
-    <li>心当たりのない登録・手続きは開かない</li>
-    <li>少しでも不審に感じたら報告する</li>
-  </ul>
-
-  <button onclick="window.close()">理解しました</button>
-</div>
-
 <script>
-/* ===== OS / ブラウザ取得 ===== */
-function getOS() {
-  const ua = navigator.userAgent;
-  if (ua.includes("Windows")) return "Windows";
-  if (ua.includes("Mac")) return "macOS";
-  if (ua.includes("Android")) return "Android";
-  if (ua.includes("iPhone")) return "iOS";
-  return "不明";
+/* ===== 情報生成 ===== */
+function randomIP() {
+  return "203.0.113." + Math.floor(Math.random() * (240 - 10 + 1) + 10);
 }
+const ip = randomIP();
+const browser = navigator.userAgent;
+const pc = location.hostname || "Unknown-PC";
 
-function getBrowser() {
-  const ua = navigator.userAgent;
-  if (ua.includes("Edg")) return "Microsoft Edge";
-  if (ua.includes("Chrome")) return "Google Chrome";
-  if (ua.includes("Firefox")) return "Mozilla Firefox";
-  if (ua.includes("Safari")) return "Safari";
-  return "不明";
-}
+/* ===== 初期表示 ===== */
+screen1.style.display = "flex";
+document.getElementById("info").innerText =
+  `PC: ${pc}\nBrowser: ${browser}\nIP: ${ip}`;
 
-/* ===== 擬似PC名 ===== */
-function fakePcName() {
-  const dept = ["OS", "SYS", "DEV", "ADM"];
-  return dept[Math.floor(Math.random() * dept.length)] +
-         "-PC-" + Math.floor(Math.random() * 900 + 100);
-}
-
-/* ===== 初期情報 ===== */
-const os = getOS();
-const browser = getBrowser();
-
-document.getElementById("os").textContent = os;
-document.getElementById("browser").textContent = browser;
-document.getElementById("env").textContent = os + " / " + browser;
-document.getElementById("pcname").textContent = fakePcName();
-
-/* 時刻 */
-document.getElementById("time").textContent =
-  new Date().toLocaleString();
-
-/* 偽IP（10～240） */
-document.getElementById("fakeIp").textContent =
-  Math.floor(Math.random() * (240 - 10 + 1)) + 10;
-
-/* ===== カウントダウン ===== */
-let count = 3;
-const countEl = document.getElementById("count");
-
-const timer = setInterval(() => {
-  count--;
-  if (count > 0) {
-    countEl.textContent = count;
-  } else {
-    clearInterval(timer);
-  }
+/* ===== カウントダウン（最初のみ） ===== */
+let c = 3;
+const cd = setInterval(() => {
+  c--;
+  document.getElementById("countdown").innerText = c;
+  if (c === 0) clearInterval(cd);
 }, 1000);
 
-/* ===== 画面遷移（3秒） ===== */
-setTimeout(() => {
-  pre.classList.add("hidden");
-  complete.classList.remove("hidden");
-}, 3000);
+/* ===== ログ内容（5秒想定） ===== */
+const logs = [
+  `Connecting to ${ip}...`,
+  "Resolving host...",
+  "Opening secure socket...",
+  "TLS handshake completed.",
+  "Authenticating client...",
+  "Firewall rule matched.",
+  "Privilege escalation detected.",
+  "Memory scan in progress...",
+  "Decrypting payload...",
+  "Reading registry keys...",
+  "Collecting system info...",
+  "Uploading packets...",
+  "Finalizing session..."
+];
 
+let i = 0;
+const logEl = document.getElementById("log");
+
+function pushLog() {
+  if (i < logs.length) {
+    logEl.innerText += logs[i] + "\n";
+    i++;
+  }
+}
+
+/* ===== 画面遷移 ===== */
 setTimeout(() => {
-  complete.classList.add("hidden");
-  training.classList.remove("hidden");
-}, 6000);
+  screen1.style.display = "none";
+  screen2.style.display = "flex";
+
+  const logTimer = setInterval(pushLog, 350);
+
+  setTimeout(() => {
+    clearInterval(logTimer);
+    screen2.style.display = "none";
+    screen3.style.display = "flex";
+
+    setTimeout(() => {
+      screen3.style.display = "none";
+      screen4.style.display = "flex";
+    }, 5000); // 赤画面 5秒
+
+  }, 5000); // ログ画面 5秒
+
+}, 3000); // 初期画面 3秒
 </script>
 
 </body>
