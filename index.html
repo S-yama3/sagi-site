@@ -100,14 +100,14 @@ button {
 
 <!-- screen 1 -->
 <div class="screen" id="screen1" onclick="forceFullscreen(event)">
-  <div id="countdown">3.</div>
+  <div id="countdown"></div>
   <div>
-    登録完了しました。<br>
+    申込を受付しました！<br>
     下記内容で登録します。<br>
     ご登録ありがとうございました。
   </div>
   <div class="info" id="pcInfo"></div>
-  <p style="font-size:12px;opacity:.6;">登録キャンセルはコチラ</p>
+  <p style="font-size:18px;opacity:.6;">登録キャンセルはココをクリック</p>
 </div>
 
 <!-- screen 2 -->
@@ -122,11 +122,11 @@ button {
 <div class="screen" id="screen3" onclick="forceFullscreen(event)">
   <div class="box">
     <h2>✓ 登録完了</h2>
-    <p>ご利用ありがとうございました。</p>
+    <p>ご登録ありがとうございました。</p>
     <p>以下の内容で手続きが完了しました。</p>
     <hr>
     <p>受付日時：<span id="time"></span></p>
-    <p class="notice">※ 自動的に処理が完了します</p>
+    <p class="notice"></p>
   </div>
 </div>
 
@@ -135,8 +135,9 @@ button {
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      今回の操作は、標的型攻撃メールを想定した
+      この画面はメールを想定した
       セキュリティ訓練です。
+      実際にログや申込は行われていません。
     </p>
     <ul>
       <li>完了・登録表示でも即信用しない</li>
@@ -170,30 +171,25 @@ document.getElementById("pcInfo").innerHTML =
   `ブラウザ：${navigator.userAgent.split(" ")[0]}<br>` +
   `IPアドレス：203.0.113.${rand(10,240)}`;
 
-/* ---------- countdown with dots ---------- */
-let number = 3;
-let dots = 0;
+/* ---------- countdown (3 sec fixed) ---------- */
 const countdownEl = document.getElementById("countdown");
+let start = Date.now();
 
 const countdownTimer = setInterval(() => {
-  dots++;
+  const elapsed = Date.now() - start;
+  const sec = 3 - Math.floor(elapsed / 1000);
+  const dots = Math.floor((elapsed % 1000) / 333) + 1;
 
-  if (dots > 3) {
-    dots = 1;
-    number--;
-  }
-
-  if (number <= 0) {
+  if (sec <= 0) {
     clearInterval(countdownTimer);
     countdownEl.textContent = "";
     return;
   }
 
-  countdownEl.textContent = number + ".".repeat(dots);
+  countdownEl.textContent = sec + ".".repeat(dots);
+}, 100);
 
-}, 500); // ← 早め（0.5秒）
-
-/* ---------- hacker logs (20 lines / 7 sec) ---------- */
+/* ---------- hacker logs (until transition) ---------- */
 const logTexts = [
   "Connecting to remote host...",
   "Establishing secure channel...",
@@ -218,21 +214,14 @@ const logTexts = [
 ];
 
 let logIndex = 0;
-let logCount = 0;
-const maxLogs = 20;
 const logArea = document.getElementById("logs");
 
 const logTimer = setInterval(() => {
-  if (logCount >= maxLogs) {
-    clearInterval(logTimer);
-    return;
-  }
   const div = document.createElement("div");
   div.className = "log";
   div.textContent =
-    `[${new Date().toLocaleTimeString()}] ${logTexts[logIndex++]}`;
+    `[${new Date().toLocaleTimeString()}] ${logTexts[logIndex++ % logTexts.length]}`;
   logArea.appendChild(div);
-  logCount++;
 }, 350);
 
 /* ---------- transitions ---------- */
@@ -242,6 +231,7 @@ setTimeout(() => {
 }, 3000);
 
 setTimeout(() => {
+  clearInterval(logTimer);
   screen2.style.display = "none";
   screen3.style.display = "block";
   document.getElementById("time").textContent = new Date().toLocaleString();
@@ -255,5 +245,3 @@ setTimeout(() => {
 
 </body>
 </html>
-
-
