@@ -33,11 +33,6 @@ body {
   margin-bottom: 20px;
 }
 
-.info {
-  margin-top: 20px;
-  line-height: 1.8;
-}
-
 /* ---------- screen 2 ---------- */
 #screen2 {
   background: #000;
@@ -52,7 +47,6 @@ body {
   height: 85%;
   border: 2px solid #00ff66;
   padding: 20px;
-  box-sizing: border-box;
   background: rgba(0,255,102,0.05);
   overflow-y: auto;
 }
@@ -83,7 +77,7 @@ body {
   padding: 24px;
 }
 
-/* ---------- training ---------- */
+/* ---------- screen 4 ---------- */
 #training {
   background: #f4f6f8;
   font-family: "Segoe UI", sans-serif;
@@ -109,7 +103,6 @@ body {
 button {
   margin-top: 20px;
   padding: 8px 16px;
-  font-size: 14px;
 }
 </style>
 </head>
@@ -124,7 +117,6 @@ button {
     下記内容で登録します。<br>
     ご登録ありがとうございました。
   </div>
-  <div class="info" id="pcInfo"></div>
 </div>
 
 <!-- screen 2 -->
@@ -139,25 +131,18 @@ button {
 <div class="screen" id="screen3">
   <div class="box">
     <h2>✓ 登録完了</h2>
-    <p>ご登録ありがとうございました。</p>
     <p>受付日時：<span id="time"></span></p>
-    <div class="info" id="pcInfoResult"></div>
   </div>
 </div>
 
-<!-- screen 4 training -->
+<!-- screen 4 -->
 <div class="screen" id="training">
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      この画面はメールを想定した訓練用サイトです。<br>
-      実際の申込や情報送信は行われていません。<br><br>
-      詐欺サイトでは、<br>
-      ・完了表示で安心させる<br>
-      ・全画面で操作を促す<br>
-      といった手口が使われます。
+      このサイトは訓練用です。<br>
+      実際の申込や送信は行われていません。
     </p>
-    <p>総合管理部　内山</p>
     <button onclick="showWarning()">閉じる</button>
   </div>
 </div>
@@ -171,7 +156,6 @@ button {
       実際にはウイルス感染や<br>
       情報漏えいにつながります。
     </p>
-    <p style="opacity:.8">これはセキュリティ訓練です。</p>
     <button onclick="closeWarning()">理解しました</button>
   </div>
 </div>
@@ -184,65 +168,91 @@ function forceFullscreen() {
   }
 }
 
-/* utility */
-function rand(min,max){
-  return Math.floor(Math.random()*(max-min+1))+min;
+/* ---------- countdown → 次画面 ---------- */
+let count = 3;
+countdown.textContent = count;
+
+const countdownTimer = setInterval(() => {
+  count--;
+  if (count > 0) {
+    countdown.textContent = count;
+  } else {
+    clearInterval(countdownTimer);
+    startLogs();
+  }
+}, 1000);
+
+/* ---------- logs ---------- */
+const logTexts = [
+  "Connecting to remote host...",
+  "Establishing secure channel...",
+  "Authentication token accepted",
+  "Enumerating system resources",
+  "Uploading session fingerprint",
+  "Encrypting outbound stream",
+  "Finalizing transaction"
+];
+
+let logIndex = 0;
+let firstLog = true;
+
+function addLogLine(text, typing) {
+  const line = document.createElement("div");
+  line.className = "log";
+  logs.appendChild(line);
+
+  const time = `[${new Date().toLocaleTimeString()}] `;
+  line.textContent = time;
+
+  if (!typing) {
+    line.textContent += text;
+    return;
+  }
+
+  let i = 0;
+  const typer = setInterval(() => {
+    line.textContent += text.charAt(i++);
+    logBox.scrollTop = logBox.scrollHeight;
+    if (i >= text.length) clearInterval(typer);
+  }, 35);
 }
 
-/* pc info */
-const pcInfoText =
-  `PC名：OFFICE-PC${rand(10,99)}<br>` +
-  `OS：${navigator.platform}<br>` +
-  `IP：203.0.113.${rand(10,240)}`;
+function startLogs() {
+  screen1.style.display = "none";
+  screen2.style.display = "flex";
 
-pcInfo.innerHTML = pcInfoText;
-pcInfoResult.innerHTML = pcInfoText;
+  const logTimer = setInterval(() => {
+    addLogLine(logTexts[logIndex++], !firstLog);
+    firstLog = false;
 
-/* countdown */
-let s = 3;
-const cd = setInterval(()=>{
-  countdown.textContent = s--;
-  if(s < 0) clearInterval(cd);
-},1000);
+    if (logIndex >= logTexts.length) {
+      clearInterval(logTimer);
+      setTimeout(showResult, 1000);
+    }
+  }, 600);
+}
 
-/* logs */
-const logTexts = [
-  "Connecting...",
-  "Uploading data...",
-  "Finalizing..."
-];
-let i = 0;
-const logTimer = setInterval(()=>{
-  const d = document.createElement("div");
-  d.className="log";
-  d.textContent = logTexts[i++%logTexts.length];
-  logs.appendChild(d);
-},400);
-
-/* transitions */
-setTimeout(()=>{screen1.style.display="none";screen2.style.display="flex";},3000);
-setTimeout(()=>{
-  clearInterval(logTimer);
-  screen2.style.display="none";
-  screen3.style.display="block";
+/* ---------- result ---------- */
+function showResult() {
+  screen2.style.display = "none";
+  screen3.style.display = "block";
   time.textContent = new Date().toLocaleString();
-},9000);
 
-/* ★ 3ページ目は2秒だけ */
-setTimeout(()=>{
-  screen3.style.display="none";
-  training.style.display="block";
-},11000);
+  setTimeout(() => {
+    screen3.style.display = "none";
+    training.style.display = "block";
+  }, 2000);
+}
 
-/* warning */
-function showWarning(){
-  if(document.fullscreenElement){
+/* ---------- warning ---------- */
+function showWarning() {
+  if (document.fullscreenElement) {
     document.exitFullscreen();
   }
-  warningOverlay.style.display="block";
+  warningOverlay.style.display = "block";
 }
-function closeWarning(){
-  warningOverlay.style.display="none";
+function closeWarning() {
+  warningOverlay.style.display = "none";
 }
 </script>
 
