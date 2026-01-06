@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>セキュリティ訓練</title>
+<title>登録完了</title>
 
 <style>
 html, body {
@@ -25,13 +25,14 @@ html, body {
   flex-direction: column;
 }
 
-/* ① 初期画面（黒） */
+/* ① 初期画面 */
 #screen1 {
   background: black;
   color: white;
+  text-align: center;
 }
 
-/* ② ログ画面（黒・緑） */
+/* ② ログ画面 */
 #screen2 {
   background: black;
   color: #00ff66;
@@ -41,32 +42,29 @@ html, body {
 .log-box {
   width: 70%;
   max-width: 900px;
-  height: 60%;
+  height: 65%;
   border: 1px solid #00ff66;
   padding: 16px;
   display: flex;
   flex-direction: column;
 }
 
-/* 固定ヘッダ */
 .log-header {
   font-size: 18px;
   margin-bottom: 8px;
 }
 
-/* ログ本文 */
 .log-body {
   flex: 1;
-  overflow: hidden;
   white-space: pre-line;
   font-size: 16px;
 }
 
-/* ③ 完了画面（赤） */
+/* ③ 完了画面 */
 #screen3 {
   background: red;
   color: white;
-  font-size: 26px;
+  text-align: center;
   animation: fade 5s linear infinite;
 }
 
@@ -91,36 +89,44 @@ html, body {
 }
 
 .countdown {
-  font-size: 64px;
+  font-size: 56px;
+  margin: 12px 0;
 }
 
-.small {
+.info {
   font-size: 14px;
-  margin-top: 10px;
+  margin-top: 12px;
+  white-space: pre-line;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ① 初期画面 -->
+<!-- ① 登録完了画面 -->
 <div id="screen1" class="screen">
-  <div>システムを確認しています</div>
+  <div>登録完了しました。</div>
   <div class="countdown" id="countdown">3</div>
-  <div class="small" id="info"></div>
+  <div>下記内容で登録します。<br>ご登録ありがとうございました。</div>
+  <div class="info" id="info"></div>
 </div>
 
 <!-- ② ログ画面 -->
 <div id="screen2" class="screen">
   <div class="log-box">
-    <div class="log-header">通信状況を確認中...</div>
+    <div class="log-header">Establishing secure connection...</div>
     <div class="log-body" id="log"></div>
   </div>
 </div>
 
-<!-- ③ 完了画面 -->
+<!-- ③ 詐欺風完了 -->
 <div id="screen3" class="screen">
-  <div>自動的に処理が完了します</div>
+  <h1>登録が完了しました</h1>
+  <p>ご利用ありがとうございました。</p>
+  <p>このまま画面を閉じてください。</p>
+  <p style="font-size:12px;margin-top:12px;">
+    ※ 自動的に処理が完了します
+  </p>
 </div>
 
 <!-- ④ 訓練説明 -->
@@ -128,33 +134,52 @@ html, body {
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      本画面は、標的型攻撃メールを想定した
-      社内セキュリティ訓練の一環として表示されています。
+      本画面は、標的型攻撃メールや偽サイトを想定した
+      社内セキュリティ訓練用の演出です。
     </p>
     <ul>
-      <li>身に覚えのない完了画面は信用しない</li>
-      <li>処理中・確認中の表示でも油断しない</li>
-      <li>不審な場合は速やかに管理者へ報告</li>
+      <li>「登録完了」「ありがとうございました」は詐欺で多用されます</li>
+      <li>端末情報の表示は安心させるための演出です</li>
+      <li>不審に感じたら速やかに管理者へ報告してください</li>
     </ul>
     <p style="font-size:12px;color:#777;margin-top:16px;">
-      ※ 実際の通信や情報送信は行われていません
+      ※ 実際の登録・通信・情報送信は行われていません
     </p>
   </div>
 </div>
 
 <script>
-/* ===== 情報生成 ===== */
+/* ===== ランダムPC名 ===== */
+const pcNames = [
+  "DESKTOP-7A3K92",
+  "PC-USER01",
+  "OFFICE-PC12",
+  "WIN-CLIENT09",
+  "CORP-WS-21"
+];
+const pcName = pcNames[Math.floor(Math.random() * pcNames.length)];
+
+/* ===== OS判定 ===== */
+function getOS() {
+  const ua = navigator.userAgent;
+  if (ua.includes("Windows NT 10")) return "Windows 10 / 11";
+  if (ua.includes("Mac")) return "macOS";
+  if (ua.includes("Android")) return "Android";
+  if (ua.includes("iPhone")) return "iOS";
+  return "Unknown OS";
+}
+
+/* ===== IP生成 ===== */
 function randomIP() {
   return "203.0.113." + Math.floor(Math.random() * (240 - 10 + 1) + 10);
 }
-const ip = randomIP();
-const browser = navigator.userAgent;
-const pc = location.hostname || "Unknown-PC";
 
-/* ===== 初期表示 ===== */
-screen1.style.display = "flex";
+/* ===== 情報表示 ===== */
 document.getElementById("info").innerText =
-  `PC名: ${pc}\nブラウザ: ${browser}\n接続IP: ${ip}`;
+  `PC名: ${pcName}
+OS: ${getOS()}
+ブラウザ: ${navigator.userAgent}
+IPアドレス: ${randomIP()}`;
 
 /* ===== カウントダウン ===== */
 let c = 3;
@@ -164,18 +189,17 @@ const cd = setInterval(() => {
   if (c === 0) clearInterval(cd);
 }, 1000);
 
-/* ===== ログ内容（5秒） ===== */
+/* ===== ログ ===== */
 const logs = [
-  `接続先 ${ip} に通信を開始`,
-  "DNS解決を実行中",
-  "セキュアチャネルを確立",
-  "認証情報を確認",
-  "ファイアウォール規則を照合",
-  "システム情報を取得",
-  "メモリ領域を解析",
-  "暗号化データを復号",
-  "通信内容を検証",
-  "処理を確定"
+  "Connecting to server...",
+  "Resolving host...",
+  "Opening TCP socket...",
+  "TLS handshake successful.",
+  "Session established.",
+  "Authenticating credentials...",
+  "Validating request...",
+  "Committing registration...",
+  "Finalizing process..."
 ];
 
 let i = 0;
@@ -189,14 +213,16 @@ function pushLog() {
 }
 
 /* ===== 画面遷移 ===== */
+screen1.style.display = "flex";
+
 setTimeout(() => {
   screen1.style.display = "none";
   screen2.style.display = "flex";
 
-  const logTimer = setInterval(pushLog, 500);
+  const timer = setInterval(pushLog, 500);
 
   setTimeout(() => {
-    clearInterval(logTimer);
+    clearInterval(timer);
     screen2.style.display = "none";
     screen3.style.display = "flex";
 
@@ -205,8 +231,7 @@ setTimeout(() => {
       screen4.style.display = "flex";
     }, 5000);
 
-  }, 5000);
-
+  }, 7000);
 }, 3000);
 </script>
 
