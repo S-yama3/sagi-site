@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>登録完了</title>
+<style>
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f8;
+}
+.box {
+  width: 520px;
+  margin: 80px auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 24px;
+}
+h1 {
+  color: #2e7d32;
+  font-size: 20px;
+}
+hr {
+  margin: 16px 0;
+}
+.notice {
+  font-size: 12px;
+  color: #777;
+}
+.hidden {
+  display: none;
+}
+button {
+  margin-top: 16px;
+  padding: 8px 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="box" id="complete">
+  <h1>✓ 登録が完了しました</h1>
+  <p>ご登録ありがとうございます。</p>
+  <p>以下の内容で手続きが完了しました。</p>
+
+  <hr>
+
+  <p><strong>登録内容</strong></p>
+  <p>サービス名：社内ポータル</p>
+  <p>受付日時：<span id="time"></span></p>
+  <p>確認環境：Windows / Google Chrome</p>
+  <p>接続元IP：203.0.113.xxx</p>
+
+  <hr>
+
+  <p>このまま画面を閉じてください。</p>
+  <p class="notice">※ 自動的に処理が完了します</p>
+</div>
+
+<div class="box hidden" id="training">
+  <h1>これはセキュリティ訓練です</h1>
+  <p>
+    今回の操作は、標的型攻撃メールを想定した
+    セキュリティ訓練です。
+  </p>
+  <p>
+    「登録完了」「確認ありがとうございます」といった
+    表現は、実際の攻撃でもよく使用されます。
+  </p>
+
+  <hr>
+
+  <ul>
+    <li>心当たりのない登録・手続きは開かない</li>
+    <li>少しでも不審に感じたら報告する</li>
+  </ul>
+
+  <button onclick="window.close()">理解しました</button>
+</div>
+
+<script>
+document.getElementById("time").textContent =
+  new Date().toLocaleString();
+
+setTimeout(() => {
+  document.getElementById("complete").classList.add("hidden");
+  document.getElementById("training").classList.remove("hidden");
+}, 6000);
+</script>
+
+</body>
+</html>
