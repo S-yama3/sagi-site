@@ -93,7 +93,7 @@ body {
   color: #000;
 }
 
-/* ---------- cancel text ---------- */
+/* ---------- cancel ---------- */
 .cancel {
   position: absolute;
   bottom: 24px;
@@ -102,18 +102,30 @@ body {
   font-size: 18px;
   opacity: 0.6;
   cursor: pointer;
-  transition: opacity 0.2s ease;
 }
 
-.cancel:hover {
-  opacity: 0.9;
-}
-
-/* ---------- button ---------- */
 button {
   margin-top: 20px;
   padding: 8px 16px;
   font-size: 14px;
+}
+
+/* ---------- warning overlay ---------- */
+#warningOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  font-family: sans-serif;
+}
+
+#warningBox {
+  max-width: 520px;
+  margin: 15% auto;
+  background: #b00000;
+  color: #fff;
+  padding: 24px;
 }
 </style>
 </head>
@@ -129,7 +141,6 @@ button {
     ご登録ありがとうございました。
   </div>
   <div class="info" id="pcInfo"></div>
-  <p style="font-size:18px;opacity:.6;">登録キャンセルはココをクリック</p>
 </div>
 
 <!-- screen 2 -->
@@ -138,7 +149,7 @@ button {
     <div class="fixed">SYSTEM INITIALIZING...</div>
     <div id="logs"></div>
   </div>
-  <div class="cancel">キャンセル</div>
+  <div class="cancel" onclick="showWarning()">キャンセル</div>
 </div>
 
 <!-- screen 3 -->
@@ -146,12 +157,11 @@ button {
   <div class="box">
     <h2>✓ 登録完了</h2>
     <p>ご登録ありがとうございました。</p>
-    <p>以下の内容で手続きが完了しました。</p>
     <hr>
     <p>受付日時：<span id="time"></span></p>
     <div class="info" id="pcInfoResult"></div>
+    <button onclick="showWarning()">閉じる</button>
   </div>
-  <div class="cancel">キャンセル</div>
 </div>
 
 <!-- training -->
@@ -159,152 +169,93 @@ button {
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      この画面はメールを想定した訓練用のサイトです。<br>
-      このサイトでログ取得や申込は行われていません。<br><br>
-      詐欺サイトではこのように意味不明な文字列を表示させたり<br>
-      申し込みが行われたような表示にします。
+      この画面は訓練用の疑似サイトです。<br>
+      実際の申込や情報送信は行われていません。
     </p>
-    <ul>
-      <li>完了・登録表示でも信用しない</li>
-      <li>全画面表示は特に注意</li>
-      <p>総合管理部　内山</p>
-    </ul>
-    <button onclick="window.close()">閉じる</button>
+  </div>
+</div>
+
+<!-- warning -->
+<div id="warningOverlay">
+  <div id="warningBox">
+    <h2>⚠ セキュリティ警告</h2>
+    <p>
+      そうやって安易にボタンを押すと、<br>
+      実際にはウイルス感染や<br>
+      マルウェア実行につながります。
+    </p>
+    <p style="opacity:.8">
+      これはセキュリティ訓練です。
+    </p>
+    <button onclick="closeWarning()">理解しました</button>
   </div>
 </div>
 
 <script>
-/* ---------- fullscreen ---------- */
+/* fullscreen */
 function forceFullscreen(e) {
   if (e.target.tagName === "BUTTON") return;
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => {});
+    document.documentElement.requestFullscreen().catch(()=>{});
   }
 }
 
-/* ---------- utility ---------- */
+/* warning */
+function showWarning() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
+  document.getElementById("warningOverlay").style.display = "block";
+}
+
+function closeWarning() {
+  document.getElementById("warningOverlay").style.display = "none";
+}
+
+/* utility */
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/* ---------- PC info ---------- */
-const pcNames = ["DESKTOP-A3X9", "OFFICE-PC12", "WIN-TERM07", "CORP-USER01"];
-
+/* pc info */
+const pcNames = ["DESKTOP-A3X9", "OFFICE-PC12", "WIN-TERM07"];
 const pcInfoText =
   `PC名：${pcNames[rand(0, pcNames.length - 1)]}<br>` +
   `OS：${navigator.platform}<br>` +
-  `ブラウザ：${navigator.userAgent.split(" ")[0]}<br>` +
   `IPアドレス：203.0.113.${rand(10,240)}`;
 
-document.getElementById("pcInfo").innerHTML = pcInfoText;
-document.getElementById("pcInfoResult").innerHTML = pcInfoText;
+pcInfo.innerHTML = pcInfoText;
+pcInfoResult.innerHTML = pcInfoText;
 
-/* ---------- countdown ---------- */
-const countdownEl = document.getElementById("countdown");
+/* countdown */
 let start = Date.now();
-
-const countdownTimer = setInterval(() => {
-  const elapsed = Date.now() - start;
-  const sec = 3 - Math.floor(elapsed / 1000);
-  const dots = Math.floor((elapsed % 1000) / 333) + 1;
-
+const timer = setInterval(() => {
+  const sec = 3 - Math.floor((Date.now() - start) / 1000);
   if (sec <= 0) {
-    clearInterval(countdownTimer);
-    countdownEl.textContent = "";
+    clearInterval(timer);
     return;
   }
-  countdownEl.textContent = sec + ".".repeat(dots);
-}, 100);
+  countdown.textContent = sec;
+}, 300);
 
-/* ---------- logs ---------- */
-const logTexts = [
-  "Connecting to remote host...",
-  "Establishing secure channel...",
-  "Authentication token accepted",
-  "Enumerating system resources",
-  "Uploading session fingerprint",
-  "Scanning open ports",
-  "Extracting browser metadata",
-  "Encrypting outbound stream",
-  "Uploading data blocks",
-  "Verifying checksum",
-  "Finalizing transaction",
-  "Disconnecting from host",
-  "Clearing traces",
-  "Process completed successfully"
+/* logs */
+const texts = [
+  "Connecting to host...",
+  "Uploading data...",
+  "Finalizing..."
 ];
-
-let logIndex = 0;
-const logArea = document.getElementById("logs");
-const logBox = document.getElementById("logBox");
-
+let i = 0;
 const logTimer = setInterval(() => {
-  const div = document.createElement("div");
-  div.className = "log";
-  div.textContent =
-    `[${new Date().toLocaleTimeString()}] ${logTexts[logIndex++ % logTexts.length]}`;
-  logArea.appendChild(div);
-  logBox.scrollTop = logBox.scrollHeight;
-}, 350);
+  const d = document.createElement("div");
+  d.className = "log";
+  d.textContent = texts[i++ % texts.length];
+  logs.appendChild(d);
+}, 400);
 
-/* ---------- transitions ---------- */
-setTimeout(() => {
-  screen1.style.display = "none";
-  screen2.style.display = "flex";
-}, 3000);
-
-setTimeout(() => {
-  clearInterval(logTimer);
-  screen2.style.display = "none";
-  screen3.style.display = "block";
-  document.getElementById("time").textContent = new Date().toLocaleString();
-}, 10000);
-
-setTimeout(() => {
-  screen3.style.display = "none";
-  training.style.display = "block";
-}, 15000);
+/* transitions */
+setTimeout(()=>{screen1.style.display="none";screen2.style.display="flex";},3000);
+setTimeout(()=>{clearInterval(logTimer);screen2.style.display="none";screen3.style.display="block";time.textContent=new Date().toLocaleString();},9000);
 </script>
 
 </body>
 </html>
-
-<script>
-/* =========================
-   Kintone アクセス記録
-   ========================= */
-
-// ▼ Kintone設定
-const KINTONE_DOMAIN = "ka710.cybozu.com";   // ←変更
-const APP_ID = 526;                         // ←変更
-const API_TOKEN = "OOMdmKWm229jiLLnoOvbkXuXoFP9hlG171YdcXmJ";       // ←変更
-
-// ▼ uid取得
-const params = new URLSearchParams(location.search);
-const uid = params.get("uid");
-
-// ▼ 日時
-const now = new Date().toISOString();
-
-// ▼ 送信URL
-const sourceUrl = location.href;
-
-// ▼ Kintoneへ送信
-if (uid) {
-  fetch(`https://${KINTONE_DOMAIN}/k/v1/record.json`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Cybozu-API-Token": API_TOKEN
-    },
-    body: JSON.stringify({
-      app: APP_ID,
-      record: {
-        uid: { value: uid },
-        access_time: { value: now },
-        source_url: { value: sourceUrl }
-      }
-    })
-  }).catch(() => {});
-}
-</script>
