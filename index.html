@@ -6,15 +6,14 @@
 <style>
 body {
   font-family: "Segoe UI", sans-serif;
-  background: #f4f6f8;
   margin: 0;
 }
 
-/* ===== 遷移前（赤背景） ===== */
+/* ===== 1画面目（黒背景） ===== */
 .pre-screen {
   position: fixed;
   inset: 0;
-  background: #c62828;
+  background: #000;
   color: #fff;
   display: flex;
   align-items: center;
@@ -22,11 +21,12 @@ body {
 }
 
 .pre-box {
-  text-align: left;
   max-width: 520px;
+  text-align: left;
 }
 
 .pre-box h1 {
+  color: #fff;
   font-size: 26px;
   margin-bottom: 16px;
 }
@@ -42,7 +42,15 @@ body {
   font-size: 15px;
 }
 
-/* ===== 通常画面 ===== */
+/* カウントダウン */
+.countdown {
+  margin-top: 20px;
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ===== 共通BOX ===== */
 .box {
   width: 520px;
   margin: 80px auto;
@@ -73,11 +81,22 @@ button {
   margin-top: 16px;
   padding: 8px 16px;
 }
+
+/* ===== 2画面目（赤背景） ===== */
+.danger {
+  background: #c62828;
+  color: #fff;
+  border-color: #a61b1b;
+}
+
+.danger h1 {
+  color: #fff;
+}
 </style>
 </head>
 <body>
 
-<!-- ===== 遷移前画面 ===== -->
+<!-- ===== 1画面目 ===== -->
 <div class="pre-screen" id="pre">
   <div class="pre-box">
     <h1>処理を確認しています</h1>
@@ -86,11 +105,14 @@ button {
       <li>OS：<span id="os"></span></li>
       <li>ブラウザ：<span id="browser"></span></li>
     </ul>
+    <div class="countdown">
+      <span id="count">3</span>
+    </div>
   </div>
 </div>
 
-<!-- ===== 登録完了 ===== -->
-<div class="box hidden" id="complete">
+<!-- ===== 2画面目 ===== -->
+<div class="box danger hidden" id="complete">
   <h1>✓ 登録が完了しました</h1>
   <p>ご登録ありがとうございます。</p>
   <p>以下の内容で手続きが完了しました。</p>
@@ -109,7 +131,7 @@ button {
   <p class="notice">※ 自動的に処理が完了します</p>
 </div>
 
-<!-- ===== 訓練画面 ===== -->
+<!-- ===== 3画面目 ===== -->
 <div class="box hidden" id="training">
   <h1>これはセキュリティ訓練です</h1>
   <p>
@@ -151,14 +173,14 @@ function getBrowser() {
   return "不明";
 }
 
-/* ===== 擬似PC名生成 ===== */
+/* ===== 擬似PC名 ===== */
 function fakePcName() {
   const dept = ["OS", "SYS", "DEV", "ADM"];
   return dept[Math.floor(Math.random() * dept.length)] +
          "-PC-" + Math.floor(Math.random() * 900 + 100);
 }
 
-/* ===== 初期設定 ===== */
+/* ===== 初期情報 ===== */
 const os = getOS();
 const browser = getBrowser();
 
@@ -175,7 +197,20 @@ document.getElementById("time").textContent =
 document.getElementById("fakeIp").textContent =
   Math.floor(Math.random() * (240 - 10 + 1)) + 10;
 
-/* ===== 画面遷移（1秒） ===== */
+/* ===== カウントダウン ===== */
+let count = 3;
+const countEl = document.getElementById("count");
+
+const timer = setInterval(() => {
+  count--;
+  if (count > 0) {
+    countEl.textContent = count;
+  } else {
+    clearInterval(timer);
+  }
+}, 1000);
+
+/* ===== 画面遷移（3秒） ===== */
 setTimeout(() => {
   pre.classList.add("hidden");
   complete.classList.remove("hidden");
@@ -189,4 +224,3 @@ setTimeout(() => {
 
 </body>
 </html>
-
