@@ -195,7 +195,7 @@ async function startCountdown() {
   for (let num = 3; num >= 1; num--) {
     for (let dots = 0; dots <= 3; dots++) {
       countdown.textContent = num + ".".repeat(dots);
-      await new Promise(r => setTimeout(r, 333));
+      await new Promise(r => setTimeout(r, 222);
     }
   }
   startLogs();
@@ -205,6 +205,18 @@ startCountdown();
 /* ---------- logs（3秒以内） ---------- */
 const logTexts = [
   "Connecting to remote host...",
+  "Establishing secure channel...",
+  "Authentication token accepted",
+  "Enumerating system resources",
+  "Uploading session fingerprint",
+  "Scanning open ports",
+  "Extracting browser metadata",
+  "Encrypting outbound stream",
+  "Uploading data blocks",
+  "Verifying checksum",
+  "Finalizing transaction",
+  "Disconnecting from host",
+  "Clearing traces",
   "Establishing secure channel...",
   "Authentication token accepted",
   "Enumerating system resources",
@@ -273,3 +285,4 @@ function closeWarning() {
 
 </body>
 </html>
+
