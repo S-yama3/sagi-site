@@ -45,7 +45,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
 }
 
 #logBox {
@@ -54,7 +53,7 @@ body {
   border: 2px solid #00ff66;
   padding: 20px;
   box-sizing: border-box;
-  background: rgba(0, 255, 102, 0.05);
+  background: rgba(0,255,102,0.05);
   overflow-y: auto;
 }
 
@@ -62,9 +61,7 @@ body {
   position: sticky;
   top: 0;
   background: #000;
-  padding-bottom: 10px;
   font-weight: bold;
-  z-index: 1;
 }
 
 .log {
@@ -76,7 +73,6 @@ body {
 #screen3 {
   background: #b00000;
   font-family: "Segoe UI", sans-serif;
-  cursor: pointer;
 }
 
 .box {
@@ -90,34 +86,16 @@ body {
 /* ---------- training ---------- */
 #training {
   background: #f4f6f8;
-  color: #000;
+  font-family: "Segoe UI", sans-serif;
 }
 
-/* ---------- cancel ---------- */
-.cancel {
-  position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 18px;
-  opacity: 0.6;
-  cursor: pointer;
-}
-
-button {
-  margin-top: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-}
-
-/* ---------- warning overlay ---------- */
+/* ---------- warning ---------- */
 #warningOverlay {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.85);
   z-index: 9999;
-  font-family: sans-serif;
 }
 
 #warningBox {
@@ -127,13 +105,19 @@ button {
   color: #fff;
   padding: 24px;
 }
+
+button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 
 <!-- screen 1 -->
-<div class="screen" id="screen1" onclick="forceFullscreen(event)">
+<div class="screen" id="screen1" onclick="forceFullscreen()">
   <div id="countdown"></div>
   <div>
     申込受付<br><br>
@@ -144,34 +128,37 @@ button {
 </div>
 
 <!-- screen 2 -->
-<div class="screen" id="screen2" onclick="forceFullscreen(event)">
+<div class="screen" id="screen2">
   <div id="logBox">
     <div class="fixed">SYSTEM INITIALIZING...</div>
     <div id="logs"></div>
   </div>
-  <div class="cancel" onclick="showWarning()">キャンセル</div>
 </div>
 
 <!-- screen 3 -->
-<div class="screen" id="screen3" onclick="forceFullscreen(event)">
+<div class="screen" id="screen3">
   <div class="box">
     <h2>✓ 登録完了</h2>
     <p>ご登録ありがとうございました。</p>
-    <hr>
     <p>受付日時：<span id="time"></span></p>
     <div class="info" id="pcInfoResult"></div>
-    <button onclick="showWarning()">閉じる</button>
   </div>
 </div>
 
-<!-- training -->
+<!-- screen 4 training -->
 <div class="screen" id="training">
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      この画面は訓練用の疑似サイトです。<br>
-      実際の申込や情報送信は行われていません。
+      この画面はメールを想定した訓練用サイトです。<br>
+      実際の申込や情報送信は行われていません。<br><br>
+      詐欺サイトでは、<br>
+      ・完了表示で安心させる<br>
+      ・全画面で操作を促す<br>
+      といった手口が使われます。
     </p>
+    <p>総合管理部　内山</p>
+    <button onclick="showWarning()">閉じる</button>
   </div>
 </div>
 
@@ -182,79 +169,81 @@ button {
     <p>
       そうやって安易にボタンを押すと、<br>
       実際にはウイルス感染や<br>
-      マルウェア実行につながります。
+      情報漏えいにつながります。
     </p>
-    <p style="opacity:.8">
-      これはセキュリティ訓練です。
-    </p>
+    <p style="opacity:.8">これはセキュリティ訓練です。</p>
     <button onclick="closeWarning()">理解しました</button>
   </div>
 </div>
 
 <script>
 /* fullscreen */
-function forceFullscreen(e) {
-  if (e.target.tagName === "BUTTON") return;
+function forceFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(()=>{});
   }
 }
 
-/* warning */
-function showWarning() {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  }
-  document.getElementById("warningOverlay").style.display = "block";
-}
-
-function closeWarning() {
-  document.getElementById("warningOverlay").style.display = "none";
-}
-
 /* utility */
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
 }
 
 /* pc info */
-const pcNames = ["DESKTOP-A3X9", "OFFICE-PC12", "WIN-TERM07"];
 const pcInfoText =
-  `PC名：${pcNames[rand(0, pcNames.length - 1)]}<br>` +
+  `PC名：OFFICE-PC${rand(10,99)}<br>` +
   `OS：${navigator.platform}<br>` +
-  `IPアドレス：203.0.113.${rand(10,240)}`;
+  `IP：203.0.113.${rand(10,240)}`;
 
 pcInfo.innerHTML = pcInfoText;
 pcInfoResult.innerHTML = pcInfoText;
 
 /* countdown */
-let start = Date.now();
-const timer = setInterval(() => {
-  const sec = 3 - Math.floor((Date.now() - start) / 1000);
-  if (sec <= 0) {
-    clearInterval(timer);
-    return;
-  }
-  countdown.textContent = sec;
-}, 300);
+let s = 3;
+const cd = setInterval(()=>{
+  countdown.textContent = s--;
+  if(s < 0) clearInterval(cd);
+},1000);
 
 /* logs */
-const texts = [
-  "Connecting to host...",
+const logTexts = [
+  "Connecting...",
   "Uploading data...",
   "Finalizing..."
 ];
 let i = 0;
-const logTimer = setInterval(() => {
+const logTimer = setInterval(()=>{
   const d = document.createElement("div");
-  d.className = "log";
-  d.textContent = texts[i++ % texts.length];
+  d.className="log";
+  d.textContent = logTexts[i++%logTexts.length];
   logs.appendChild(d);
-}, 400);
+},400);
 
 /* transitions */
 setTimeout(()=>{screen1.style.display="none";screen2.style.display="flex";},3000);
-setTimeout(()=>{clearInterval(logTimer);screen2.style.display="none";screen3.style.display="block";time.textContent=new Date().toLocaleString();},9000);
+setTimeout(()=>{
+  clearInterval(logTimer);
+  screen2.style.display="none";
+  screen3.style.display="block";
+  time.textContent = new Date().toLocaleString();
+},9000);
+
+/* ★ 3ページ目は2秒だけ */
+setTimeout(()=>{
+  screen3.style.display="none";
+  training.style.display="block";
+},11000);
+
+/* warning */
+function showWarning(){
+  if(document.fullscreenElement){
+    document.exitFullscreen();
+  }
+  warningOverlay.style.display="block";
+}
+function closeWarning(){
+  warningOverlay.style.display="none";
+}
 </script>
 
 </body>
