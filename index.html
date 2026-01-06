@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Security Training</title>
+<title>セキュリティ訓練</title>
 
 <style>
 html, body {
@@ -25,22 +25,44 @@ html, body {
   flex-direction: column;
 }
 
-/* ① 黒（初期） */
+/* ① 初期画面（黒） */
 #screen1 {
   background: black;
   color: white;
 }
 
-/* ② 黒（ログ） */
+/* ② ログ画面（黒・緑） */
 #screen2 {
   background: black;
   color: #00ff66;
-  align-items: flex-start;
-  padding: 30px;
-  font-size: 18px;
 }
 
-/* ③ 赤（完了） */
+/* ログ枠 */
+.log-box {
+  width: 70%;
+  max-width: 900px;
+  height: 60%;
+  border: 1px solid #00ff66;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 固定ヘッダ */
+.log-header {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+/* ログ本文 */
+.log-body {
+  flex: 1;
+  overflow: hidden;
+  white-space: pre-line;
+  font-size: 16px;
+}
+
+/* ③ 完了画面（赤） */
 #screen3 {
   background: red;
   color: white;
@@ -76,10 +98,6 @@ html, body {
   font-size: 14px;
   margin-top: 10px;
 }
-
-#log {
-  white-space: pre-line;
-}
 </style>
 </head>
 
@@ -87,17 +105,20 @@ html, body {
 
 <!-- ① 初期画面 -->
 <div id="screen1" class="screen">
-  <div>Initializing System...</div>
+  <div>システムを確認しています</div>
   <div class="countdown" id="countdown">3</div>
   <div class="small" id="info"></div>
 </div>
 
-<!-- ② ログ流し -->
+<!-- ② ログ画面 -->
 <div id="screen2" class="screen">
-  <div id="log"></div>
+  <div class="log-box">
+    <div class="log-header">通信状況を確認中...</div>
+    <div class="log-body" id="log"></div>
+  </div>
 </div>
 
-<!-- ③ 完了 -->
+<!-- ③ 完了画面 -->
 <div id="screen3" class="screen">
   <div>自動的に処理が完了します</div>
 </div>
@@ -107,16 +128,16 @@ html, body {
   <div class="box">
     <h2>これはセキュリティ訓練です</h2>
     <p>
-      今回表示された一連の画面は、
-      標的型攻撃メールを想定した社内訓練です。
+      本画面は、標的型攻撃メールを想定した
+      社内セキュリティ訓練の一環として表示されています。
     </p>
     <ul>
-      <li>完了・確認画面でも安易に信用しない</li>
-      <li>処理中ログは攻撃でよく使われる演出</li>
-      <li>不審な場合は必ず管理者へ報告</li>
+      <li>身に覚えのない完了画面は信用しない</li>
+      <li>処理中・確認中の表示でも油断しない</li>
+      <li>不審な場合は速やかに管理者へ報告</li>
     </ul>
     <p style="font-size:12px;color:#777;margin-top:16px;">
-      ※ 実際の通信・情報送信は行われていません
+      ※ 実際の通信や情報送信は行われていません
     </p>
   </div>
 </div>
@@ -133,9 +154,9 @@ const pc = location.hostname || "Unknown-PC";
 /* ===== 初期表示 ===== */
 screen1.style.display = "flex";
 document.getElementById("info").innerText =
-  `PC: ${pc}\nBrowser: ${browser}\nIP: ${ip}`;
+  `PC名: ${pc}\nブラウザ: ${browser}\n接続IP: ${ip}`;
 
-/* ===== カウントダウン（最初のみ） ===== */
+/* ===== カウントダウン ===== */
 let c = 3;
 const cd = setInterval(() => {
   c--;
@@ -143,21 +164,18 @@ const cd = setInterval(() => {
   if (c === 0) clearInterval(cd);
 }, 1000);
 
-/* ===== ログ内容（5秒想定） ===== */
+/* ===== ログ内容（5秒） ===== */
 const logs = [
-  `Connecting to ${ip}...`,
-  "Resolving host...",
-  "Opening secure socket...",
-  "TLS handshake completed.",
-  "Authenticating client...",
-  "Firewall rule matched.",
-  "Privilege escalation detected.",
-  "Memory scan in progress...",
-  "Decrypting payload...",
-  "Reading registry keys...",
-  "Collecting system info...",
-  "Uploading packets...",
-  "Finalizing session..."
+  `接続先 ${ip} に通信を開始`,
+  "DNS解決を実行中",
+  "セキュアチャネルを確立",
+  "認証情報を確認",
+  "ファイアウォール規則を照合",
+  "システム情報を取得",
+  "メモリ領域を解析",
+  "暗号化データを復号",
+  "通信内容を検証",
+  "処理を確定"
 ];
 
 let i = 0;
@@ -175,7 +193,7 @@ setTimeout(() => {
   screen1.style.display = "none";
   screen2.style.display = "flex";
 
-  const logTimer = setInterval(pushLog, 350);
+  const logTimer = setInterval(pushLog, 500);
 
   setTimeout(() => {
     clearInterval(logTimer);
@@ -185,11 +203,11 @@ setTimeout(() => {
     setTimeout(() => {
       screen3.style.display = "none";
       screen4.style.display = "flex";
-    }, 5000); // 赤画面 5秒
+    }, 5000);
 
-  }, 5000); // ログ画面 5秒
+  }, 5000);
 
-}, 3000); // 初期画面 3秒
+}, 3000);
 </script>
 
 </body>
