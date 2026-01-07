@@ -342,10 +342,37 @@ function closeWarning() {
   window.close();
   setTimeout(()=>location.href="about:blank",300);
 }
+
+/* ---------- training ID auto collect ---------- */
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const trainingId = params.get("id");
+
+  if (!trainingId) return;
+
+  const formURL =
+    "https://docs.google.com/forms/d/e/1FAIpQLSdg0uzG-xU44cMWbvKM2Cw3xeB_dYsZ_fZFMnrhzXAu8QQHzQ/formResponse";
+
+  const entryKey = "entry.69028879";
+
+  const data = new URLSearchParams();
+  data.append(entryKey, trainingId);
+
+  fetch(formURL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: data.toString()
+  });
+})();
+
 </script>
 
 </body>
 </html>
+
 
 
 
