@@ -350,17 +350,17 @@ function closeWarning() {
 
   if (!trainingId) return;
 
-  const nowTime = new Date().toLocaleString(); // ★ 追加
+  const nowTime = new Date().toLocaleString();
 
   const formURL =
     "https://docs.google.com/forms/d/e/1FAIpQLSdg0uzG-xU44cMWbvKM2Cw3xeB_dYsZ_fZFMnrhzXAu8QQHzQ/formResponse";
 
-  const entryKey = "entry.69028879";
-  const entryKey = "entry.681739223";
+  const entryId   = "entry.69028879";   // 訓練ID
+  const entryTime = "entry.681739223";  // TIME
 
   const data = new URLSearchParams();
-  data.append(entryKey, trainingId);
-  data.append(entryTime, nowTime); 
+  data.append(entryId, trainingId);
+  data.append(entryTime, nowTime);
 
   fetch(formURL, {
     method: "POST",
@@ -372,10 +372,12 @@ function closeWarning() {
   });
 })();
 
+
 </script>
 
 </body>
 </html>
+
 
 
 
